@@ -55,4 +55,6 @@ void updateLocalisation(t_localisation *, t_move);
 
 t_move *getRandomMoves(int N);
 
+int checkCrevasseInTheWay(t_move, t_localisation, t_map);
+
 #endif //UNTITLED1_MOVES_H

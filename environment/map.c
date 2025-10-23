@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "map.h"
-#include "queue.h"
+#include "../data-structures/queue.h"
 
 /* prototypes of local functions */
 /* local functions are used only in this file, as helper functions */
