@@ -111,7 +111,6 @@ int main() {
             printf("]\n");
 
             t_move *path = best_path(tree, &nb_move);
-
             printf("The movement(s) required to arrive at the nearest point to the base : [");
             for (int j = 0; j < nb_move; j++) {
                 printf("%s ", getMoveAsString(path[j]));
