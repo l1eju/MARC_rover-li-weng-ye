@@ -165,22 +165,41 @@ void updateLocalisation(t_localisation *p_loc, t_move m)
 
 t_move *getRandomMoves(int N)
 {
-    srand(time(NULL));  //Set la fonction rand
-    int nbmoves[]={22,15,7,7,21,21,7};
-    int total_moves=100;
+    static int seeded = 0;
+    if (!seeded) {
+        srand((unsigned)time(NULL));  //Set la fonction rand
+        seeded = 1;
+    }
+    static int nbmoves[]={22,15,7,7,21,21,7};
+    static int total_moves=100;
+    if (N > total_moves) N = total_moves;
+    if (N <= 0 || total_moves == 0) return NULL;
+
     t_move *moves = (t_move *)malloc(N * sizeof(t_move));
     for (int i = 0; i < N; i++)
     {
         int r = rand() % total_moves;
-        int type=0;
-        while (r >= nbmoves[type])
-        {
+        int type = 0;
+        while (r >= nbmoves[type]){
             r -= nbmoves[type];
             type++;
         }
         nbmoves[type]--;
         total_moves--;
-        moves[i] = (t_move )type;
+        moves[i] = (t_move)type;
     }
     return moves;
+}
+
+int checkCrevasseInTheWay(t_move move, t_localisation robot, t_map map){
+    int case_to_check;  //Nombre de case entre le point de départ et arrivé à verifier
+    if (move == F_20) case_to_check = 1;
+    else if (move == F_30) case_to_check = 2;
+    else return 0;
+
+    for (int i=1; i<=case_to_check; i++){
+        updateLocalisation(&robot, F_10);
+        if (!isValidLocalisation(robot.pos, map.x_max, map.y_max) || map.costs[robot.pos.y][robot.pos.x] >= 10000) return i;
+    }
+    return 0;
 }

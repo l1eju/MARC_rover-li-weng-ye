@@ -4,7 +4,7 @@
 
 #ifndef UNTITLED1_PATH_H
 #define UNTITLED1_PATH_H
-#include "node_queue.h"
+#include "../data-structures/node_queue.h"
 
 p_node* tab_of_min(p_node node, int* len);//Trouve toutes les feuilles de valeur min dans un noeud.
 

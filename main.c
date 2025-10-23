@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include "map.h"
-#include "path.h"
+#include "environment/map.h"
+#include "environment/path.h"
+#include "environment/moves.h"
 
 int main() {
 
@@ -34,18 +35,15 @@ int main() {
 
     displayMap(map);
 
-    t_move *moves;
     int x, y;
     t_orientation ori;
 
     if (!val) {
-        moves = getRandomMoves(NB_possibilities);
         x = 4;
         y = 6;
         ori = NORTH;
     }
     else {
-        moves = getRandomMoves(NB_possibilities);
         printf("Please enter MARC inital position \n");
 
         do {
@@ -64,7 +62,7 @@ int main() {
                 if (r != 1) {
                     while (getchar() != '\n'); // Pour éviter un cycle infini si l'entrée est invalide
                 }
-            } while (x < 0 || x > map.y_max - 1 || r != 1);
+            } while (y < 0 || y > map.y_max - 1 || r != 1);
 
             if (map.costs[y][x] >= 10000) printf("The position is invalid, MARC is on a CREVASSE\n");
         } while (map.costs[y][x] >= 10000); //Si on est sur une crevasse on recommence
@@ -85,45 +83,51 @@ int main() {
         else if (choice == 3) ori = SOUTH;
         else ori = WEST;
     }
-    t_localisation MARC = loc_init(x, y, ori);
-
-    printf("Here are the possible movements : [ ");
-    for (int j = 0; j < NB_possibilities; j++) {
-        printf("%s ", getMoveAsString(moves[j]));
-        if (j < NB_possibilities - 1) {
-            printf("; ");
-        }
-    }
-    printf("]\n");
-
-
-
-    t_tree tree = create_tree(moves, MARC, map);
-
-    int min_val = search_min(tree);
-    printf("The minimum value on which MARC can arrive is %d\n", min_val);
 
     t_position base = getBaseStationPosition(map);
+    t_localisation MARC = loc_init(x, y, ori);
 
-    int nb_move;
-    t_move *path = best_path(tree, &nb_move);
-    if (nb_move == 0) printf("MARC can't move at all ");
-    else {
-        if (!min_val) printf("MARC can return to the base !\n");
-        else printf("Sadly, MARC can't return to the base, but he can get close to it\n");
+    if (MARC.pos.x == base.x && MARC.pos.y == base.y) printf("MARS is already at home!");
+    else{
+        t_move *moves;
+        int loop = 0, total_moves = 0, nb_move;
 
-        printf("The movement(s) required to arrive at the minimum value sheet is: [");
-        for (int j = 0; j < nb_move; j++) {
-            printf("%s ", getMoveAsString(path[j]));
-            updateLocalisation(&MARC, path[j]);
-            if (j < nb_move) {
-                printf("; ");
+        do{
+            loop++;
+            moves = getRandomMoves(NB_possibilities);
+            if (moves == NULL){
+                printf("MARC ran out of movements and can't get home...\n");
+                exit(EXIT_FAILURE);
             }
-        }
-        printf("]\n");
+            t_tree tree = create_tree(moves, MARC, map);
 
-        if (MARC.pos.x == base.x && MARC.pos.y == base.y) printf("Welcome Home MARC!");
-        else printf("MARC didn't arrive home, we hope wind will push you to the base MARC");
+            printf("Here are the possible for the %d loop(s) movements : \n[ ", loop);
+            for (int j = 0; j < NB_possibilities; j++) {
+                printf("%s ", getMoveAsString(moves[j]));
+                if (j < NB_possibilities - 1) {
+                    printf("; ");
+                }
+            }
+            printf("]\n");
+
+            t_move *path = best_path(tree, &nb_move);
+
+            printf("The movement(s) required to arrive at the nearest point to the base : [");
+            for (int j = 0; j < nb_move; j++) {
+                printf("%s ", getMoveAsString(path[j]));
+                updateLocalisation(&MARC, path[j]);
+                if (j < nb_move) {
+                    printf("; ");
+                }
+            }
+            printf("]\n\n");
+
+            total_moves += nb_move;
+        } while (MARC.pos.x != base.x || MARC.pos.y != base.y);
+
+        printf("MARS needed %d move(s) and %d loop(s) to arrive.\n", total_moves, loop);
+        printf("Welcome Home MARC!\n");
     }
+
     return 0;
 }

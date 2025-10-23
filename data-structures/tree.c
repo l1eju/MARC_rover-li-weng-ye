@@ -51,9 +51,23 @@ p_node create_all_Node(int nb_poss, int depth, t_move mouvement, t_move* possibi
     p_node node = createNode(nb_poss, depth, mouvement, robot, map, parent_node);   //Initialise le nouveau noeud
 
     for (int i = 0; i < nb_poss; i++) {
-        t_localisation new_loc = robot;
 
-        updateLocalisation(&new_loc, possibilities[i]); //On stocke la nouvelle position du robot selon le mouvement associé dans new_loc
+        t_localisation new_loc = robot;
+        int crevasse = checkCrevasseInTheWay(possibilities[i], robot, map);
+        t_move real_move;
+        switch (crevasse) {
+            case 0: //Si il n'y a pas de crevasse sur le chemin du mouvement, on fait le mouvement.
+                real_move = possibilities[i];
+                break;
+            case 1: //Si il y a une crevasse sur la 1ère case du mouvement, on fait le mouvement qui nous arrête à ce point (on tombre).
+                real_move = F_10;
+                break;
+            case 2: //Même chose pour la 2ème case
+                real_move = F_20;
+                break;
+        }
+        updateLocalisation(&new_loc, real_move); //On stocke la nouvelle position du robot selon le mouvement associé dans new_loc
+
         if (isValidLocalisation(new_loc.pos, map.x_max, map.y_max)) { //Si la position après le mouvement est valide, on crée les enfants
 
             t_move* new_possibilities = remove_move(possibilities, nb_poss, i);                  //On crée le nouveau tableau de possibilités en retirant la case du noeud qu'on va créer car on l'aura déjà utilisé et on a déjà stocker la position après le mouvement pour connaître le coût

@@ -57,10 +57,11 @@ p_node min_leaf(t_tree t) {
  * @return Retourne la feuille de valeur minimale et ayant le parcours le parcours le plus optimal
  */
 p_node min_leaf_node(p_node node){
-    int len = 0, cost = 0, cheaper = 10000, idx;//Stocke le nb de feuille de val min, le coût total du parcours de la feuille parcouru et le coût le moins élevé
+    int len = 0, cheaper = 10000, idx;//Stocke le nb de feuille de val min, le coût total du parcours de la feuille parcouru et le coût le moins élevé
     p_node* tab_min = tab_of_min(node, &len); //Prend toutes les feuilles de val min
 
     for (int i = 0; i < len; i++){  //Parcours toutes les feuilles pour calculer leur coût de parcours total
+        int cost = 0; //Coût total pour le chemin de cette feuille
         p_node cur = tab_min[i];
         while (cur != NULL) {   //Tant que cur n'est pas NULL on parcours
             cost += cur->value; //Additionne la val du noeud au coût total de la feuille

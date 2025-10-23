@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
-#include "map.h"
-#include "moves.h"
+#include "../environment/map.h"
+#include "../environment/moves.h"
 
 #define NB_possibilities 9
 #define NB_choices 5
